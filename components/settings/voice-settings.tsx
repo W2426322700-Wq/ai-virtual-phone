@@ -692,7 +692,11 @@ export function VoiceSettings() {
                                                         </div>
                                                     ) : (
                                                         <select
-                                                            value={config.model === "tts-1" || config.model === "tts-1-hd" ? config.model : "__manual__"}
+                                                            value={
+                                                                config.provider === "OpenAI"
+                                                                    ? (config.model === "tts-1" || config.model === "tts-1-hd" ? config.model : "__manual__")
+                                                                    : (DEFAULT_ELEVENLABS_MODELS.some(m => m.id === config.model) ? config.model : "__manual__")
+                                                            }
                                                             onChange={(e) => {
                                                                 if (e.target.value === "__manual__") {
                                                                     setManualModelIds(prev => ({ ...prev, [config.id]: true }));
@@ -702,8 +706,16 @@ export function VoiceSettings() {
                                                             }}
                                                             className="ui-select"
                                                         >
-                                                            <option value="tts-1">tts-1</option>
-                                                            <option value="tts-1-hd">tts-1-hd</option>
+                                                            {config.provider === "OpenAI" ? (
+                                                                <>
+                                                                    <option value="tts-1">tts-1</option>
+                                                                    <option value="tts-1-hd">tts-1-hd</option>
+                                                                </>
+                                                            ) : (
+                                                                DEFAULT_ELEVENLABS_MODELS.map(m => (
+                                                                    <option key={m.id} value={m.id}>{m.name}</option>
+                                                                ))
+                                                            )}
                                                             <option value="__manual__">手动输入...</option>
                                                         </select>
                                                     )}
