@@ -295,7 +295,7 @@ export function VoiceSettings() {
                 model: "eleven_multilingual_v2",
                 defaultVoice: "",
             });
-            setManualModelIds(prev => ({ ...prev, [id]: true }));
+            setManualModelIds(prev => ({ ...prev, [id]: false }));
             setManualVoiceIds(prev => ({ ...prev, [id]: true }));
             return;
         }
