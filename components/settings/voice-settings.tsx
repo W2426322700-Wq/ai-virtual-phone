@@ -49,6 +49,14 @@ const DEFAULT_MINIMAX_MODELS = [
     { id: "speech-01-turbo", name: "speech-01-turbo (速度快/性价比高)" },
 ];
 
+const DEFAULT_ELEVENLABS_MODELS = [
+    { id: "eleven_multilingual_v2", name: "eleven_multilingual_v2 (默认)" },
+    { id: "eleven_multilingual_v3", name: "eleven_multilingual_v3 (最新v3)" },
+    { id: "eleven_monolingual_v1", name: "eleven_monolingual_v1 (纯英语)" },
+    { id: "eleven_turbo_v2", name: "eleven_turbo_v2 (极速)" },
+    { id: "eleven_turbo_v2_5", name: "eleven_turbo_v2_5 (极速v2.5)" }
+];
+
 const MINIMAX_LANGUAGE_OPTIONS = [
     { value: "", label: "不指定（保持默认）" },
     { value: "auto", label: "自动识别" },
@@ -292,7 +300,7 @@ export function VoiceSettings() {
             updateConfig(id, {
                 provider: "ElevenLabs",
                 baseUrl: "https://api.elevenlabs.io/v1",
-                model: "eleven_multilingual_v2",
+                model: "eleven_multilingual_v3",
                 defaultVoice: "",
             });
             setManualModelIds(prev => ({ ...prev, [id]: false }));
