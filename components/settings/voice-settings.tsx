@@ -679,17 +679,19 @@ export function VoiceSettings() {
                                                 placeholder="输入密钥..."
                                             />
                                         </div>
-                                        {config.provider === "OpenAI" && (
+                                        {(config.provider === "OpenAI" || config.provider === "ElevenLabs") && (
                                             <>
-                                                <div className="flex flex-col gap-1">
-                                                    <label className="menu-desc ml-1">接口地址 (Base URL)</label>
-                                                    <Input
-                                                        type="text"
-                                                        value={config.baseUrl || ""}
-                                                        onChange={(e) => updateConfig(config.id, { baseUrl: e.target.value })}
-                                                        placeholder="https://api.openai.com/v1"
-                                                    />
-                                                </div>
+                                                {config.provider === "OpenAI" && (
+                                                    <div className="flex flex-col gap-1">
+                                                        <label className="menu-desc ml-1">接口地址 (Base URL)</label>
+                                                        <Input
+                                                            type="text"
+                                                            value={config.baseUrl || ""}
+                                                            onChange={(e) => updateConfig(config.id, { baseUrl: e.target.value })}
+                                                            placeholder="https://api.openai.com/v1"
+                                                        />
+                                                    </div>
+                                                )}
                                                 <div className="flex flex-col gap-1">
                                                     <label className="menu-desc ml-1">语音模型 (TTS Model)</label>
                                                     {manualModelIds[config.id] ? (
