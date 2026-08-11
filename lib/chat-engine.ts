@@ -715,7 +715,8 @@ async function readSseStream(
         }
     };
     const handleEvent = async (eventText: string) => {
-        rawResponse += `${eventText}\n`;
+        // 原始流只为调试快照保留头部：长输出整条累积会把低内存设备的 WebView 顶爆
+        if (rawResponse.length < 65_536) rawResponse += `${eventText}\n`;
         for (const parsed of sseParser.pushEvent(eventText)) {
             await handleParsed(parsed);
         }
@@ -1060,6 +1061,8 @@ export async function sendLLMToolStreamRequest(
         followUpCount?: number;
         debugSessionId?: string;
         signal?: AbortSignal;
+        /** 单次最大输出 token：按调用覆盖预设值（工坊输出护栏用） */
+        maxTokens?: number;
     },
     callbacks?: ChatCompletionStreamCallbacks,
 ): Promise<LLMToolRequestResult> {
@@ -1067,7 +1070,7 @@ export async function sendLLMToolStreamRequest(
     const pluginPurpose = options?.appId ?? "chat";
     const afterPlugins = await applyChatPluginLlmRequest(preset, messages, pluginPurpose, options?.debugSessionId);
     const effectivePreset = afterPlugins.preset;
-    const request = buildProviderRequest(config, effectivePreset, afterPlugins.messages, { tools, stream: true });
+    const request = buildProviderRequest(config, effectivePreset, afterPlugins.messages, { tools, stream: true, maxTokens: options?.maxTokens });
     publishDebugPromptSnapshot({ request, config, preset: effectivePreset, meta, options, requestKind: "native-tools-stream", tools });
     const requestBodyJson = JSON.stringify(request.body);
     const llmAbort = new AbortController();
@@ -1142,7 +1145,7 @@ export async function sendLLMToolStreamRequest(
             const parsed = parseSseEvents(buffer);
             buffer = parsed.rest;
             for (const event of parsed.events) {
-                rawResponse += `${event}\n`;
+                if (rawResponse.length < 65_536) rawResponse += `${event}\n`;
                 for (const data of sseParser.pushEvent(event)) {
                     await handleParsedDelta(data);
                 }
@@ -1150,7 +1153,7 @@ export async function sendLLMToolStreamRequest(
         }
 
         if (buffer.trim()) {
-            rawResponse += buffer.trim();
+            if (rawResponse.length < 65_536) rawResponse += buffer.trim();
             for (const data of sseParser.pushEvent(buffer)) {
                 await handleParsedDelta(data);
             }
